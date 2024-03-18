@@ -8,3 +8,9 @@ erl_crash.dump
 *.beam
 /config/*.secret.exs
 .elixir_ls/
+
+# Pragmatic Studiocourse folders
+exercise-solutions/
+upload-images/
+video-code/
+vscode/
