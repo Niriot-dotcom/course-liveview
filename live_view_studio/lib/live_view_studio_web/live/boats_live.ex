@@ -2,6 +2,8 @@ defmodule LiveViewStudioWeb.BoatsLive do
   use LiveViewStudioWeb, :live_view
 
   alias LiveViewStudio.Boats
+  alias LiveViewStudioWeb.CustomComponents
+  # import LiveViewStudioWeb.CustomComponents
 
   def mount(_params, _session, socket) do
     socket =
@@ -19,90 +21,83 @@ defmodule LiveViewStudioWeb.BoatsLive do
     ~H"""
     <h1>Daily Boat Rentals</h1>
     <div id="boats">
-      <form phx-change="filter">
-        <div class="filters">
-          <select name="type">
-            <%= Phoenix.HTML.Form.options_for_select(
-              type_options(),
-              @filter.type
-            ) %>
-          </select>
-          <div class="prices">
-            <%= for price <- ["$", "$$", "$$$"] do %>
-              <input
-                type="checkbox"
-                name="prices[]"
-                value={price}
-                id={price}
-                checked={price in @filter.prices}
-              />
-              <label for={price}><%= price %></label>
-            <% end %>
-            <input type="hidden" name="prices[]" value="" />
-          </div>
-        </div>
-      </form>
+      <.filter_form filter={@filter} />
 
-      <.promo hours_expiration={2}>
+      <CustomComponents.promo hours_expiration={2}>
         Save 25% on rentals
 
         <:legal>
           <Heroicons.exclamation_circle />
           Limit 1 per party
         </:legal>
-      </.promo>
+      </CustomComponents.promo>
 
       <div class="boats">
-        <div :for={boat <- @boats} class="boat">
-          <img src={boat.image} />
-          <div class="content">
-            <div class="model">
-              <%= boat.model %>
-            </div>
-            <div class="details">
-              <span class="price">
-                <%= boat.price %>
-              </span>
-              <span class="type">
-                <%= boat.type %>
-              </span>
-            </div>
-          </div>
-        </div>
+        <.boat_card :for={boat <- @boats} boat={boat} />
       </div>
 
-      <.promo>
+      <CustomComponents.promo>
         Hurry, only 3 boats left!
 
         <:legal>
           Excluding weekends
         </:legal>
-      </.promo>
+      </CustomComponents.promo>
     </div>
     """
   end
 
-  # types (requirements)
-  attr(:hours_expiration, :integer, default: 24)
-  slot(:legal)
-  slot(:inner_block, required: true)
+  # BOATS function components
+  attr(:boat, LiveViewStudio.Boats.Boat, required: true)
 
-  # function components
-  def promo(assigns) do
+  def boat_card(assigns) do
     ~H"""
-    <div class="promo">
-      <div class="deal">
-        <%= render_slot(@inner_block) %>
-      </div>
-
-      <div class="expiration">
-        DEAL EXPIRES IN <%= @hours_expiration %> HOURS
-      </div>
-
-      <div class="legal">
-        <%= render_slot(@legal) %>
+    <div class="boat">
+      <img src={@boat.image} />
+      <div class="content">
+        <div class="model">
+          <%= @boat.model %>
+        </div>
+        <div class="details">
+          <span class="price">
+            <%= @boat.price %>
+          </span>
+          <span class="type">
+            <%= @boat.type %>
+          </span>
+        </div>
       </div>
     </div>
+    """
+  end
+
+  attr(:filter, :map, required: true)
+
+  def filter_form(assigns) do
+    ~H"""
+    <form phx-change="filter">
+      <div class="filters">
+        <select name="type">
+          <%= Phoenix.HTML.Form.options_for_select(
+            type_options(),
+            @filter.type
+          ) %>
+        </select>
+        <div class="prices">
+          <%= for price <- ["$", "$$", "$$$"] do %>
+            <input
+              type="checkbox"
+              name="prices[]"
+              value={price}
+              id={price}
+              checked={price in @filter.prices}
+            />
+            <label for={price}><%= price %></label>
+          <% end %>
+          <input type="hidden" name="prices[]" value="" />
+        </div>
+      </div>
+    </form>
     """
   end
 
