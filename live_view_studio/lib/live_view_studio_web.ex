@@ -87,6 +87,9 @@ defmodule LiveViewStudioWeb do
       import LiveViewStudioWeb.CoreComponents
       import LiveViewStudioWeb.Gettext
 
+      # my global components
+      import LiveViewStudioWeb.PromoComponents
+
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 

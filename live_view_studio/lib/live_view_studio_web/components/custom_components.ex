@@ -1,26 +1,30 @@
 defmodule LiveViewStudioWeb.CustomComponents do
   use Phoenix.Component
 
-  # PROMO
-  attr(:hours_expiration, :integer, default: 24)
-  slot(:legal)
-  slot(:inner_block, required: true)
+  # BADGE
+  attr(:label, :string, required: true)
+  attr(:class, :string, default: nil)
+  attr(:rest, :global)
 
-  def promo(assigns) do
+  def badge(assigns) do
     ~H"""
-    <div class="promo">
-      <div class="deal">
-        <%= render_slot(@inner_block) %>
-      </div>
+    <span
+      {@rest}
+      class={"inline-flex items-center gap-0.5 rounded-full
+            bg-gray-300 px-3 py-0.5 text-sm font-medium
+            text-gray-800 hover:cursor-pointer #{@class}"}>
+      <%= @label %>
+      <Heroicons.x_mark class="h-3 w-3 text-gray-600" />
+    </span>
+    """
+  end
 
-      <div class="expiration">
-        DEAL EXPIRES IN <%= @hours_expiration %> HOURS
-      </div>
+  # LOADING INDICATOR
+  attr(:loading, :boolean, required: true)
 
-      <div class="legal">
-        <%= render_slot(@legal) %>
-      </div>
-    </div>
+  def loader(assigns) do
+    ~H"""
+    <div :if={@loading} class="loader"></div>
     """
   end
 end
