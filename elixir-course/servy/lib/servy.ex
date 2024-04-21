@@ -1,18 +1,9 @@
 defmodule Servy do
-  @moduledoc """
-  Documentation for `Servy`.
-  """
+  def hello(name) do
+    "Hello, #{name}"
+  end
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Servy.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def howdy(name) do
+    "Howdy, #{name}!"
   end
 end
