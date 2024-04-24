@@ -1,0 +1,30 @@
+Enum.random
+Enum.shuffle
+Enum.take_random
+
+===> EXERCISE:
+possible_pairs = for rank <- ranks, suit <- suits, do: {rank, suit}
+length(possible_pairs) = 52
+
+===> EXERCISE:
+Enum.take_random(possible_pairs, 13)
+[
+  {"6", "♥"},
+  {"2", "♦"},
+  {"5", "♣"},
+  {"6", "♠"},
+  {"Q", "♥"},
+  {"K", "♣"},
+  {"K", "♥"},
+  {"5", "♥"},
+  {"J", "♥"},
+  {"4", "♦"},
+  {"K", "♠"},
+  {"9", "♦"},
+  {"A", "♠"}
+]
+
+deck
+|> Enum.shuffle
+|> Enum.chunk_every(13)
+|> IO.inspect
