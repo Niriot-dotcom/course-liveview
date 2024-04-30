@@ -21,6 +21,7 @@ defmodule LiveViewStudioWeb.Router do
     
     # course
     live "/light", LightLive
+    live "/servers/:id", ServersLive
 
     live "/sandbox", SandboxLive
     live "/sales", SalesLive

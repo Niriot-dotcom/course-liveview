@@ -27,4 +27,34 @@ defmodule LiveViewStudioWeb.CustomComponents do
     <div :if={@loading} class="loader"></div>
     """
   end
+
+  def server(assigns) do
+    ~H"""
+    <div class="server">
+      <div class="header">
+        <h2><%= @server.name %></h2>
+        <span class={@server.status}>
+          <%= @server.status %>
+        </span>
+      </div>
+      <div class="body">
+        <div class="row">
+          <span>
+            <%= @server.deploy_count %> deploys
+          </span>
+          <span>
+            <%= @server.size %> MB
+          </span>
+          <span>
+            <%= @server.framework %>
+          </span>
+        </div>
+        <h3>Last Commit Message:</h3>
+        <blockquote>
+          <%= @server.last_commit_message %>
+        </blockquote>
+      </div>
+    </div>
+    """
+  end
 end
