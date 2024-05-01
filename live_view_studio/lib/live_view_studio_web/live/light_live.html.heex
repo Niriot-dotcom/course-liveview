@@ -1,0 +1,44 @@
+<h1>Focus Light Render</h1>
+<div id="light">
+  <div class="meter">
+    <span style={"width: #{@brightness}%; background-color: #{temp_color(@temp)}"}><%= assigns.brightness %>%</span>
+  </div>
+
+  <%!-- actions --%>
+  <button phx-click="off">
+    <img src="/images/light-off.svg" />
+  </button>
+
+  <button phx-click="down">
+    <img src="/images/down.svg" />
+  </button>
+  <button phx-click="up">
+    <img src="/images/up.svg" />
+  </button>
+
+  <button phx-click="on">
+    <img src="/images/light-on.svg" />
+  </button>
+
+
+  <button phx-click="fire">
+    <img src="/images/fire.svg" />
+  </button>
+
+  <%!-- slider --%>
+  <form phx-change="slide">
+    <input type="range" min="0" max="100" name="brightness" value={@brightness} phx-debounce="250" />
+  </form>
+
+  <%!-- temperature --%>
+  <form phx-change="update-temp">
+    <div class="temps">
+      <%= for temp <- ["3000", "4000", "5000"] do %>
+        <div>
+          <input type="radio" id={temp} name="temp" value={temp} checked={temp === @temp} />
+          <label for={temp}><%= temp %></label>
+        </div>
+      <% end %>
+    </div>
+  </form>
+</div>
