@@ -1,5 +1,15 @@
 <h1>Food Bank Donations</h1>
 <div id="donations">
+  <form phx-change="select-per-page">
+    <select name="per-page">
+      <%= Phoenix.HTML.Form.options_for_select(
+        [5, 8, 10, 15, 20],
+        @options.per_page
+      ) %>
+    </select>
+    <label>per page</label>
+  </form>
+
   <div class="wrapper">
     <table>
       <thead>
@@ -41,5 +51,32 @@
         </tr>
       </tbody>
     </table>
+
+    <div class="footer">
+      <div class="pagination">
+        <.link
+          :if={@options.page > 1}
+          patch={~p"/donations?#{%{@options | page: @options.page - 1}}"}
+        >
+          Previous
+        </.link>
+
+        <%= for {page, active} <- @pages do %>
+          <.link
+            class={if active, do: "active"}
+            patch={~p"/donations?#{%{@options | page: page}}"}
+          >
+            <%= page %>
+          </.link>
+        <% end %>
+
+        <.link
+          :if={@options.page * @options.per_page < @donation_count}
+          patch={~p"/donations?#{%{@options | page: @options.page + 1}}"}
+        >
+          Next
+        </.link>
+      </div>
+    </div>
   </div>
 </div>

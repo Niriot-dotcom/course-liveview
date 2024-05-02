@@ -11,15 +11,20 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   def handle_params(params, _uri, socket) do
     sort_by = valid_sort_by(params)
     sort_order = valid_sort_order(params)
+    page = (params["page"] || "1") |> String.to_integer()
+    per_page = (params["per_page"] || "5") |> String.to_integer()
 
     options = %{
       sort_by: sort_by,
-      sort_order: sort_order
+      sort_order: sort_order,
+      page: page,
+      per_page: per_page
     }
 
     socket =
       assign(socket,
         pizza_orders: PizzaOrders.list_pizza_orders(options),
+        count_pizza_orders: PizzaOrders.count_pizza_orders(),
         options: options
       )
 
@@ -34,7 +39,7 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   def sort_link(assigns) do
     ~H"""
     <.link patch={
-      ~p"/pizza-orders?#{%{sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}
+      ~p"/pizza-orders?#{%{@options | sort_by: @sort_by, sort_order: next_sort_order(@options.sort_order)}}"}
     >
       <%= render_slot(@inner_block) %>
       <%= if @options.sort_by == @sort_by do %>
@@ -68,4 +73,11 @@ defmodule LiveViewStudioWeb.PizzaOrdersLive do
   end
 
   defp valid_sort_order(_params), do: :asc
+
+  def handle_event("select-per-page", %{"per-page" => per_page}, socket) do
+    params = %{socket.assigns.options | per_page: per_page}
+    socket = push_patch(socket, to: ~p"/pizza-orders?#{params}")
+
+    {:noreply, socket}
+  end
 end

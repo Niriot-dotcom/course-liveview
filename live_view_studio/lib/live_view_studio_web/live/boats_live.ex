@@ -17,6 +17,18 @@ defmodule LiveViewStudioWeb.BoatsLive do
     # {:ok, socket}
   end
 
+  def handle_params(params, _uri, socket) do
+    filter = %{type: params["type"] || "", prices: params["prices"] || [""]}
+
+    socket =
+      assign(socket,
+        boats: Boats.list_boats(filter),
+        filter: filter
+      )
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
     <h1>Daily Boat Rentals</h1>
@@ -103,13 +115,12 @@ defmodule LiveViewStudioWeb.BoatsLive do
 
   def handle_event("filter", %{"type" => type, "prices" => prices}, socket) do
     filter = %{type: type, prices: prices}
-    boats = Boats.list_boats(filter)
 
     # boats assigned to the socket. with temporary_assigns, is 0
-    IO.inspect(length(socket.assigns.boats), label: "Assigned boats")
-    IO.inspect(length(boats), label: "Filtered boats")
+    # IO.inspect(length(socket.assigns.boats), label: "Assigned boats")
+    # IO.inspect(length(boats), label: "Filtered boats")
 
-    {:noreply, assign(socket, boats: boats, filter: filter)}
+    {:noreply, push_patch(socket, to: ~p"/boats?#{filter}")}
   end
 
   defp type_options do
