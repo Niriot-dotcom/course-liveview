@@ -10,11 +10,11 @@ defmodule LiveViewStudioWeb.VolunteersLive do
     changeset = Volunteers.change_volunteer(%Volunteer{})
 
     socket =
-      assign(socket,
-        volunteers: volunteers,
-        form: to_form(changeset)
-      )
+      socket
+      |> stream(:volunteers, volunteers)
+      |> assign(:form, to_form(changeset))
 
+    IO.inspect(socket.assigns.streams.volunteers, label: "mount")
     {:ok, socket}
   end
 
@@ -34,9 +34,11 @@ defmodule LiveViewStudioWeb.VolunteersLive do
         <%= inspect(@form, pretty: true) %>
       </pre> --%>
 
+      <div id="volunteers" phx-update="stream">
       <div
-        :for={volunteer <- @volunteers}
+        :for={{volunteer_id, volunteer} <- @streams.volunteers}
         class={"volunteer #{if volunteer.checked_out, do: "out"}"}
+        id={volunteer_id}
       >
         <div class="name">
           <%= volunteer.name %>
@@ -50,6 +52,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
           </button>
         </div>
       </div>
+      </div>
     </div>
     """
   end
@@ -60,6 +63,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
       |> Volunteers.change_volunteer(volunteer_params)
       |> Map.put(:action, :validate)
 
+    IO.inspect(socket.assigns.streams.volunteers, label: "validate (after render volunteers)")
     {:noreply, assign(socket, form: to_form(changeset))}
   end
 
@@ -68,16 +72,12 @@ defmodule LiveViewStudioWeb.VolunteersLive do
     # IO.inspect(result, label: "result Volunteer")
     case Volunteers.create_volunteer(volunteer_params) do
       {:ok, volunteer} ->
-        socket =
-          update(
-            socket,
-            :volunteers,
-            fn volunteers -> [volunteer | volunteers] end
-          )
+        socket = stream_insert(socket, :volunteers, volunteer, at: 0)
 
         changeset = Volunteers.change_volunteer(%Volunteer{})
 
         socket = put_flash(socket, :info, "New volunteer saved successfully!")
+        IO.inspect(socket.assigns.streams.volunteers, label: "save (after stream_insert)")
         {:noreply, assign(socket, form: to_form(changeset))}
 
       {:error, changeset} ->
