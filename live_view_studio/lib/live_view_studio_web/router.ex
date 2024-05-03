@@ -21,13 +21,14 @@ defmodule LiveViewStudioWeb.Router do
     
     # course
     live "/light", LightLive
-    live "/servers/:id", ServersLive
-
+    
     live "/sandbox", SandboxLive
     live "/sales", SalesLive
     live "/flights", FlightsLive
     live "/boats", BoatsLive
     live "/servers", ServersLive
+    live "/servers/new", ServersLive, :new
+    live "/servers/:id", ServersLive
     live "/donations", DonationsLive
     live "/volunteers", VolunteersLive
     live "/topsecret", TopSecretLive
