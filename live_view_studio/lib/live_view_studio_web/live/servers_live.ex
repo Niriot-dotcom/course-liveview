@@ -4,6 +4,7 @@ defmodule LiveViewStudioWeb.ServersLive do
   alias LiveViewStudio.Servers
   alias LiveViewStudio.Servers.Server
   alias LiveViewStudioWeb.CustomComponents
+  alias LiveViewStudioWeb.ServerFormComponent
 
   def mount(_params, _session, socket) do
     servers = Servers.list_servers()
@@ -48,21 +49,7 @@ defmodule LiveViewStudioWeb.ServersLive do
       <div class="main">
         <div class="wrapper">
           <%= if @live_action == :new do %>
-            <.form for={@form} phx-submit="save" phx-change="validate">
-              <.label for="name">Name</.label>
-              <.input field={@form[:name]} autocomplete="off" phx-debounce="2000"/>
-              <.label for="framework">Framework</.label>
-              <.input field={@form[:framework]} autocomplete="off" phx-debounce="2000"/>
-              <.label for="size">Size (MB)</.label>
-              <.input field={@form[:size]} type="number" autocomplete="off" phx-debounce="blur"/>
-
-              <.button phx-disable-with="Saving...">
-                Save
-              </.button>
-              <.link patch={~p"/servers"} class="cancel">
-                Cancel
-              </.link>
-            </.form>
+            <.live_component module={ServerFormComponent} id={:new_server} />
           <% else %>
             <CustomComponents.server server={@selected_server} />
           <% end %>
@@ -89,23 +76,26 @@ defmodule LiveViewStudioWeb.ServersLive do
   end
 
   def handle_params(_, _uri, socket) do
-    # {:noreply,
-    #  assign(socket,
-    #    selected_server: hd(socket.assigns.servers)
-    #  )}
     socket =
       if socket.assigns.live_action == :new do
-        changeset = Servers.change_server(%Server{})
-
-        assign(socket,
-          selected_server: nil,
-          form: to_form(changeset)
-        )
+        assign(socket, selected_server: nil)
       else
-        assign(socket,
-          selected_server: hd(socket.assigns.servers)
-        )
+        assign(socket, selected_server: hd(socket.assigns.servers))
       end
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:server_created, server}, socket) do
+    socket =
+      update(
+        socket,
+        :servers,
+        fn servers -> [server | servers] end
+      )
+
+    socket = put_flash(socket, :info, "New server saved successfully!")
+    socket = push_patch(socket, to: ~p"/servers/#{server}")
 
     {:noreply, socket}
   end
@@ -138,37 +128,5 @@ defmodule LiveViewStudioWeb.ServersLive do
 
   def handle_event("drink", _, socket) do
     {:noreply, update(socket, :coffees, &(&1 + 1))}
-  end
-
-  def handle_event("validate", %{"server" => server_params}, socket) do
-    changeset =
-      %Server{}
-      |> Servers.change_server(server_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, form: to_form(changeset))}
-  end
-
-  def handle_event("save", %{"server" => server_params}, socket) do
-    case Servers.create_server(server_params) do
-      {:ok, new_server} ->
-        socket =
-          update(
-            socket,
-            :servers,
-            fn servers -> [new_server | servers] end
-          )
-
-        changeset = Servers.change_server(%Server{})
-
-        socket = put_flash(socket, :info, "New server saved successfully!")
-        # socket = push_patch(socket, to: ~p"/servers/#{length(socket.assigns.servers)}")
-        {:noreply, assign(socket, form: to_form(changeset))}
-
-      {:error, changeset} ->
-        socket = put_flash(socket, :error, "Please check the provided information")
-        IO.inspect(changeset, label: "changeset")
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
   end
 end
