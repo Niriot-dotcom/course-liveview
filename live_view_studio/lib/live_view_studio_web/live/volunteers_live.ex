@@ -6,6 +6,10 @@ defmodule LiveViewStudioWeb.VolunteersLive do
   alias LiveViewStudioWeb.VolunteerFormComponent
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Volunteers.subscribe()
+    end
+
     volunteers = Volunteers.list_volunteers()
 
     socket =
@@ -38,8 +42,6 @@ defmodule LiveViewStudioWeb.VolunteersLive do
     {:ok, volunteer} =
       Volunteers.delete_volunteer(volunteer)
 
-    socket = stream_delete(socket, :volunteers, volunteer)
-    IO.inspect(socket.assigns.streams.volunteers, label: "delete")
     {:noreply, socket}
   end
 
@@ -49,12 +51,21 @@ defmodule LiveViewStudioWeb.VolunteersLive do
     {:ok, volunteer} =
       Volunteers.toggle_status_volunteer(volunteer)
 
-    {:noreply, stream_insert(socket, :volunteers, volunteer)}
+    {:noreply, socket}
   end
 
   def handle_info({:volunteer_created, volunteer}, socket) do
     socket = update(socket, :count, &(&1 + 1))
     {:noreply, stream_insert(socket, :volunteers, volunteer, at: 0)}
+  end
+
+  def handle_info({:volunteer_updated, volunteer}, socket) do
+    {:noreply, stream_insert(socket, :volunteers, volunteer)}
+  end
+
+  def handle_info({:volunteer_deleted, volunteer}, socket) do
+    socket = update(socket, :count, &(&1 - 1))
+    {:noreply, stream_delete(socket, :volunteers, volunteer)}
   end
 
   def volunteer(assigns) do
