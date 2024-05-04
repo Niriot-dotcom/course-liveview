@@ -33,9 +33,9 @@ defmodule LiveViewStudioWeb.CustomComponents do
     <div class="server">
       <div class="header">
         <h2><%= @server.name %></h2>
-        <span class={@server.status}>
+        <button phx-click="toggle-status" phx-value-id={@server.id} class={@server.status}>
           <%= @server.status %>
-        </span>
+        </button>
       </div>
       <div class="body">
         <div class="row">

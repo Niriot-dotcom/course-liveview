@@ -18,7 +18,7 @@ defmodule LiveViewStudio.Volunteers do
 
   """
   def list_volunteers do
-    Repo.all(from v in Volunteer, order_by: [desc: v.id])
+    Repo.all(from(v in Volunteer, order_by: [desc: v.id]))
   end
 
   @doc """
@@ -100,5 +100,9 @@ defmodule LiveViewStudio.Volunteers do
   """
   def change_volunteer(%Volunteer{} = volunteer, attrs \\ %{}) do
     Volunteer.changeset(volunteer, attrs)
+  end
+
+  def toggle_status_volunteer(%Volunteer{} = volunteer) do
+    update_volunteer(volunteer, %{checked_out: !volunteer.checked_out})
   end
 end
