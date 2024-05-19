@@ -20,6 +20,19 @@ defmodule LiveViewStudioWeb.BingoLive do
     <h1>Bingo Boss 📢</h1>
     <h3>User ID: <%= pad_user_id(@current_user) %></h3>
 
+    <div class="users">
+    <ul>
+    <li>
+      <span class="username">
+        Mike
+      </span>
+      <span class="timestamp">
+        20:50
+      </span>
+    </li>
+    </ul>
+    </div>
+
     <div id="bingo">
       <div class="number">
         <%= @number %>

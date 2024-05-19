@@ -39,7 +39,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
   def handle_event("delete", %{"id" => id}, socket) do
     volunteer = Volunteers.get_volunteer!(id)
 
-    {:ok, volunteer} =
+    {:ok, _volunteer} =
       Volunteers.delete_volunteer(volunteer)
 
     {:noreply, socket}
@@ -48,7 +48,7 @@ defmodule LiveViewStudioWeb.VolunteersLive do
   def handle_event("toggle-status", %{"id" => id}, socket) do
     volunteer = Volunteers.get_volunteer!(id)
 
-    {:ok, volunteer} =
+    {:ok, _volunteer} =
       Volunteers.toggle_status_volunteer(volunteer)
 
     {:noreply, socket}
