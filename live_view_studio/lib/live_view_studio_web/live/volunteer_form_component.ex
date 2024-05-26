@@ -21,13 +21,21 @@ defmodule LiveViewStudioWeb.VolunteerFormComponent do
 
   def render(assigns) do
     ~H"""
-    <div>
+    <div phx-update="ignore" id="form-wrapper">
       <div class="count">
         Go for it! You'll be volunteer #<%= @count + 1 %>
       </div>
       <.form for={@form} phx-submit="save" phx-change="validate" phx-target={@myself}>
         <.input field={@form[:name]} placeholder="Name" autocomplete="off" phx-debounce="2000" />
-        <.input field={@form[:phone]} type="tel" placeholder="Phone" autocomplete="off" phx-debounce="blur" />
+        <.input
+          field={@form[:phone]}
+          type="tel"
+          placeholder="Phone"
+          autocomplete="off"
+          phx-debounce="blur"
+          id="phonenumber-input"
+          phx-hook="PhoneNumber"
+        />
 
         <.button phx-disable-with="Saving...">
           Check In

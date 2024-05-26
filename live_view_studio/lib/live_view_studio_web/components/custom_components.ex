@@ -32,7 +32,19 @@ defmodule LiveViewStudioWeb.CustomComponents do
     ~H"""
     <div class="server">
       <div class="header">
-        <h2><%= @server.name %></h2>
+        <%!-- <h2><%= @server.name %></h2> --%>
+        <.link
+          id={"link-#{@server.id}-clipboard"}
+          phx-hook="Clipboard"
+          data-content={"/servers/?id=#{@server.id}"}
+        >
+        <%!-- data-content={url(@socket, ~p"/servers/?id=#{@server.id}")} --%>
+
+          <h2>
+            <%= @server.name %>
+          </h2>
+        </.link>
+
         <button phx-click="toggle-status" phx-value-id={@server.id} class={@server.status}>
           <%= @server.status %>
         </button>

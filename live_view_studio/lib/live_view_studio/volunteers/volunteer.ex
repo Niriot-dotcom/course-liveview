@@ -3,14 +3,15 @@ defmodule LiveViewStudio.Volunteers.Volunteer do
   import Ecto.Changeset
 
   schema "volunteers" do
-    field :name, :string
-    field :phone, :string
-    field :checked_out, :boolean, default: false
+    field(:name, :string)
+    field(:phone, :string)
+    field(:checked_out, :boolean, default: false)
 
     timestamps()
   end
 
-  @phone ~r/^\d{3}[\s-.]?\d{3}[\s-.]?\d{4}$/
+  # @phone ~r/^\d{3}[\s-.]?\d{3}[\s-.]?\d{4}$/
+  @phone ~r/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/
 
   @doc false
   def changeset(volunteer, attrs) do

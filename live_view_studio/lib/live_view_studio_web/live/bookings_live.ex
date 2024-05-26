@@ -5,13 +5,21 @@ defmodule LiveViewStudioWeb.BookingsLive do
   import Number.Currency
 
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      %{"timezone" => tz} = get_connect_params(socket)
+    end
+
+    # if multiple LiveViews needed to know the current user's timezone, you could define an on_mount callback that's used by a live session
+    # def on_mount(:assign_time_zone, _params, _session, socket) do
+    #   %{"timezone" => tz} = get_connect_params(socket)
+
+    #   {:cont, assign(socket, :time_zone, tz)}
+    # end
+
     {:ok,
      assign(socket,
        bookings: Bookings.list_bookings(),
-       selected_dates: %{
-         from: Bookings.add_days(1),
-         to: Bookings.add_days(3)
-       }
+       selected_dates: nil
      )}
   end
 
@@ -19,11 +27,16 @@ defmodule LiveViewStudioWeb.BookingsLive do
     ~H"""
     <h1>Bookings</h1>
     <div id="bookings">
-      <div id="booking-calendar">
-        <div class="placeholder">
-          calendar here
-        </div>
+
+      <%!-- ignore re-render --%>
+      <div phx-update="ignore" id="calendar-wrapper">
+        <div
+          id="booking-calendar"
+          phx-hook="Calendar"
+        />
+        <%!-- data-unavailable-dates={Jason.encode!(@bookings)} --%>
       </div>
+
       <div :if={@selected_dates} class="details">
         <div>
           <span class="date">
@@ -48,6 +61,10 @@ defmodule LiveViewStudioWeb.BookingsLive do
     """
   end
 
+  def handle_event("dates-picked", [from, to], socket) do
+    {:noreply, assign(socket, selected_dates: %{from: parse_date(from), to: parse_date(to)})}
+  end
+
   def handle_event("book-selected-dates", _, socket) do
     %{selected_dates: selected_dates, bookings: bookings} = socket.assigns
 
@@ -55,8 +72,13 @@ defmodule LiveViewStudioWeb.BookingsLive do
       socket
       |> assign(:bookings, [selected_dates | bookings])
       |> assign(:selected_dates, nil)
+      |> push_event("add-unavailable-dates", selected_dates)
 
     {:noreply, socket}
+  end
+
+  def handle_event("unavailable-dates", _, socket) do
+    {:reply, %{dates: socket.assigns.bookings}, socket}
   end
 
   def format_date(date) do
@@ -75,6 +97,9 @@ defmodule LiveViewStudioWeb.BookingsLive do
   end
 
   def parse_date(date_string) do
-    date_string |> Timex.parse!("{ISO:Extended}") |> Timex.to_date()
+    date_string
+    |> Timex.parse!("{ISO:Extended}")
+    |> Timex.Timezone.convert(:local)
+    |> Timex.to_date()
   end
 end
