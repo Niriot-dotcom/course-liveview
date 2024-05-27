@@ -3,6 +3,63 @@
   <.form for={@form} phx-submit="save" phx-change="validate">
     <.input field={@form[:name]} placeholder="Name" />
 
+    <div class="hint">
+      Add up to <%= @uploads.photos.max_entries %> photos
+      (max <%= trunc(@uploads.photos.max_file_size / 1_000_000) %> MB each)
+    </div>
+
+    <%!-- only accepts if we click a button --%>
+    <%!-- <.live_file_input upload={@uploads.photos} /> --%>
+
+    <%!-- accects drag and drop --%>
+    <%!-- <div class="drop" phx-drop-target={@uploads.photos.ref}>
+      <.live_file_input upload={@uploads.photos} />
+      or drag and drop here
+    </div> --%>
+    
+    <div class="drop" phx-drop-target={@uploads.photos.ref}>
+      <div>
+        <img src="/images/upload.svg">
+        <div>
+          <label for={@uploads.photos.ref}>
+            <span>Upload a file</span>
+            <.live_file_input upload={@uploads.photos} class="sr-only" />
+          </label>
+          <span>or drag and drop here</span>
+        </div>
+        <p>
+          <%= @uploads.photos.max_entries %> photos max,
+          up to <%= trunc(@uploads.photos.max_file_size / 1_000_000) %> MB each
+        </p>
+      </div>
+    </div>
+
+    <.error :for={err <- upload_errors(@uploads.photos)}>
+      <%= Phoenix.Naming.humanize(err) %>
+    </.error>
+
+    <div class="entry" :for={entry <- @uploads.photos.entries}>
+      <%!-- live_img_preview works as img tag, so we can use width="75" --%>
+      <.live_img_preview entry={entry}/>
+      <div class="progress">
+        <div class="value">
+          <%= entry.progress %>%
+        </div>
+        <div class="bar">
+          <span style={"width: #{entry.progress}%;"} />
+        </div>
+
+        <.error :for={err <- upload_errors(@uploads.photos, entry)}>
+          <%= Phoenix.Naming.humanize(err) %>
+        </.error>
+      </div>
+
+      <%!-- delete --%>
+      <a phx-click="cancel" phx-value-ref={entry.ref}>
+        &times;
+      </a>
+    </div>
+
     <.button phx-disable-with="Uploading...">
       Upload
     </.button>
