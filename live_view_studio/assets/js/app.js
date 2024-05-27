@@ -36,6 +36,19 @@ const USER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken, timezone: USER_TIMEZONE },
   hooks: Hooks,
+
+  /* CHECKS IF SHIFT KEY WAS PRESSED (keydown event) */
+  // def handle_event("an-event", %{"key" => key, "shiftKey" => shiftKey}, socket) do
+  //   {:noreply, socket}
+  // end
+  metadata: {
+    keydown: (e, el) => {
+      return {
+        key: e.key,
+        shiftKey: e.shiftKey,
+      };
+    },
+  },
 });
 
 // Show progress bar on live navigation and form submits

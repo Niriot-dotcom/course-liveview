@@ -23,13 +23,11 @@ defmodule LiveViewStudioWeb.LightLive do
   end
 
   def handle_event("down", _, socket) do
-    socket = update(socket, :brightness, &max(0, &1 - 10))
-    {:noreply, socket}
+    {:noreply, down(socket)}
   end
 
   def handle_event("up", _, socket) do
-    socket = update(socket, :brightness, &min(100, &1 + 10))
-    {:noreply, socket}
+    {:noreply, up(socket)}
   end
 
   def handle_event("on", _, socket) do
@@ -52,5 +50,27 @@ defmodule LiveViewStudioWeb.LightLive do
   def handle_event("update-temp", params, socket) do
     %{"temp" => t} = params
     {:noreply, assign(socket, temp: t)}
+  end
+
+  # KEY EVENTS
+  def handle_event("update", %{"key" => "ArrowUp"}, socket) do
+    {:noreply, up(socket)}
+  end
+
+  def handle_event("update", %{"key" => "ArrowDown"}, socket) do
+    {:noreply, down(socket)}
+  end
+
+  def handle_event("update", _, socket) do
+    {:noreply, socket}
+  end
+
+  # helper functions
+  defp up(socket) do
+    update(socket, :brightness, &min(100, &1 + 10))
+  end
+
+  defp down(socket) do
+    update(socket, :brightness, &max(0, &1 - 10))
   end
 end

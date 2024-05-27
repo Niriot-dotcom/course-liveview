@@ -115,4 +115,27 @@ defmodule LiveViewStudioWeb.DonationsLive do
       end
     end
   end
+
+  # KEY EVENTS
+  def handle_event("update", %{"key" => "ArrowRight"}, socket) do
+    socket = push_patch(socket, to: ~p"/donations?#{new_page(socket, "next")}")
+    {:noreply, socket}
+  end
+
+  def handle_event("update", %{"key" => "ArrowLeft"}, socket) do
+    socket = push_patch(socket, to: ~p"/donations?#{new_page(socket, "previous")}")
+    {:noreply, socket}
+  end
+
+  def handle_event("update", _, socket) do
+    {:noreply, socket}
+  end
+
+  # helper functions
+  defp new_page(socket, action) do
+    case action do
+      "next" -> %{socket.assigns.options | page: socket.assigns.options.page + 1}
+      "previous" -> %{socket.assigns.options | page: socket.assigns.options.page - 1}
+    end
+  end
 end
