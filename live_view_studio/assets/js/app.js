@@ -22,6 +22,7 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import Hooks from "./hooks";
+import Uploaders from "./uploaders";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -36,6 +37,7 @@ const USER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken, timezone: USER_TIMEZONE },
   hooks: Hooks,
+  uploaders: Uploaders,
 
   /* CHECKS IF SHIFT KEY WAS PRESSED (keydown event) */
   // def handle_event("an-event", %{"key" => key, "shiftKey" => shiftKey}, socket) do
